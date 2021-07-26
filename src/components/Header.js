@@ -1,13 +1,22 @@
 import React from 'react'
 import Image from 'next/image'
+import {useRouter} from "next/router"
 import {MenuIcon,SearchIcon,ShoppingCartIcon} from '@heroicons/react/outline'
+import { signIn, signOut, useSession } from 'next-auth/client'
+import { useSelector } from 'react-redux'
+import { selectItems } from '../slices/basketSlice'
 
 const Header = () => {
+    const [session] = useSession();
+    // console.log("session",session.user)
+    const router = useRouter();
+    const items=  useSelector(selectItems)
     return (
         <header>
             <div className='flex items-center bg-amazon_blue p-1 py-2 flex-grow'>
             <div className='mt-2 items-center flex flex-grow sm:flex-grow-0'>
                 <Image
+                 onClick={() => router.push('/')}
                  src='https://links.papareact.com/f90'
                  width={150}
                  height={40}
@@ -20,16 +29,18 @@ const Header = () => {
                 <SearchIcon className='h-12 p-4' color='white' />
             </div>
             <div className='text-white mx-2 flex items-center text-xs space-x-6'>
-                <div className='link'>
-                    <p>Hi, Avnish Chhabra</p>
+                <div onClick={!session ? signIn : signOut} className='link'>
+                    <p>{session ? `Hello, ${session.user.name}` : 'Sign in'}</p>
                     <b className='md:text-sm'>Account & Lists</b>
                 </div>
                 <div className='link'>
                 <p>Returns</p>
                     <b className='md:text-sm'>& Orders</b>
                 </div>
-                <div className='link flex items-center relative'>
-                    <span className='absolute top-0 right-0 md:right-10 h-4 w-4 bg-yellow-400 rounded-full text-center text-black font-bold'>0</span>
+                <div onClick={() => router.push('/checkout')} className='link flex items-center relative'>
+                    <span className='absolute top-0 right-0 md:right-10 h-4 w-4 bg-yellow-400 rounded-full text-center text-black font-bold'>
+                        {items.length}
+                    </span>
                   <ShoppingCartIcon className='h-10' color='white' />
                     <b className='md:text-sm hidden md:inline mt-2'>Basket</b>
                 </div>
